@@ -1,0 +1,17 @@
+import { useAuth } from "@/Contexts/AuthContext";
+
+export const Header = () => {
+
+    const { signOut } = useAuth();
+
+    const handleSignOut = async () => {
+        await signOut();
+    }
+
+    return (
+        <header className="p-4 bg-blue-600 text-white">
+            <h1 className="text-2xl font-bold">MindLog</h1>
+            <button onClick={handleSignOut}> Sair </button>
+        </header>
+    )
+}
