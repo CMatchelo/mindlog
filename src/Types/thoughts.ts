@@ -1,5 +1,5 @@
 export interface Thought {
-  id: string;
+  id?: string;
   situation: string;
   emotion?: string;
   automaticThought: string;

@@ -2,15 +2,11 @@
 
 import { getFirebaseErrorMessage } from "@/utils/firebaseErros";
 import { FirebaseError } from "firebase/app";
-import {
-  onAuthStateChanged,
-  signInWithEmailAndPassword,
-} from "firebase/auth";
+import { onAuthStateChanged, signInWithEmailAndPassword } from "firebase/auth";
 import { createContext, useEffect, useState } from "react";
-import { auth, db } from "../../firebase";
+import { auth } from "../../firebase";
 import React from "react";
-import { Client, Professional } from "@/Types/user";
-import { doc, getDoc } from "firebase/firestore";
+import { Client, Professional, UserType } from "@/Types/user";
 
 type AppUser = Professional | Client | null;
 
@@ -34,42 +30,37 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, async (fbUser) => {
-      if (fbUser) {
-        const userDoc = await getDoc(doc(db, "users", fbUser.uid));
-
-        if (userDoc.exists()) {
-          const data = userDoc.data();
-
-          if (data.role === "professional") {
-            const professional: Professional = {
-              uid: fbUser.uid,
-              email: fbUser.email ?? "",
-              firstName: data.firstName ?? "",
-              lastName: data.lastName ?? "",
-              role: "professional",
-              patients: data.clients ?? [],
-            };
-            setUser(professional);
-          } else if (data.role === "client") {
-            const client: Client = {
-              uid: fbUser.uid,
-              email: fbUser.email ?? "",
-              firstName: data.firstName ?? "",
-              lastName: data.lastName ?? "",
-              role: "client",
-              nameResponsible: data.nameResponsible ?? "",
-              thoughts: data.thoughts ?? [],
-            };
-            setUser(client);
-          }
-        } else {
-          setUser(null);
-        }
-      } else {
+      if (!fbUser) {
         setUser(null);
+        setLoading(false);
+        return;
       }
 
-      setLoading(false);
+      try {
+        // pega o token para autenticar na API
+        const token = await fbUser.getIdToken();
+
+        const res = await fetch("/api/getUser", {
+          method: "GET",
+          headers: { 
+            "Content-type": "application/json",
+            Authorization: `Bearer ${token}`
+          },
+        });
+
+        console.log("Resposta da API:", res);
+
+        if (!res.ok) throw new Error("Erro ao buscar usuário");
+
+        const fullUser: UserType = await res.json();
+        console.log("Usuário completo:", fullUser);
+        setUser(fullUser);
+      } catch (err) {
+        console.error("Erro ao carregar usuário:", err);
+        setUser(null);
+      } finally {
+        setLoading(false);
+      }
     });
 
     return () => unsubscribe();

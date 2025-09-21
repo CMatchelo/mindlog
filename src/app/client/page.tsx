@@ -4,9 +4,9 @@ import { Header } from "@/components/Header";
 import { useAuth } from "@/Contexts/AuthContext";
 import { useRoleGuard } from "@/hooks/useRoleGuard";
 import { useRouter } from "next/navigation";
+import { RegisterTought } from "./components/registerThought";
 
 export default function Page() {
-
   const { user, loading } = useAuth();
   const router = useRouter();
 
@@ -16,7 +16,7 @@ export default function Page() {
   if (!user && loading) {
     return <div>Carregando...</div>;
   }
-  
+
   if (!user && !loading) {
     router.push(`/login`);
   }
@@ -25,6 +25,7 @@ export default function Page() {
     <div>
       <Header />
       <h1>Cliente: {user?.email}</h1>
+      <RegisterTought />
     </div>
   );
 }
