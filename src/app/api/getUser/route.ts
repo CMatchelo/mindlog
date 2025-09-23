@@ -1,5 +1,6 @@
 import { Thought } from "@/Types/thoughts";
-import { Client, Professional } from "@/Types/user";
+import { Admin, Client, Professional } from "@/Types/user";
+import { decryptThought } from "@/utils/crypto";
 import admin from "firebase-admin";
 import { NextResponse } from "next/server";
 
@@ -12,6 +13,15 @@ if (!admin.apps.length) {
     }),
   });
 }
+
+const decryptData = (data: Record<string, unknown>) => {
+  return Object.fromEntries(
+    Object.entries(data).map(([key, value]) => [
+      key,
+      typeof value === "string" ? decryptThought(value) : value,
+    ])
+  );
+};
 
 export async function GET(req: Request) {
   try {
@@ -32,6 +42,18 @@ export async function GET(req: Request) {
     }
 
     const userData = userSnap.data();
+
+    if (userData?.role === "admin") {
+      const admin: Admin = {
+        uid: decoded.uid,
+        firstName: userData.firstName,
+        lastName: userData.lastName,
+        email: userData.email,
+        role: "admin",
+      };
+      return NextResponse.json(admin, { status: 200 });
+    }
+
     if (userData?.role === "client") {
       const thoughtsSnap = await admin
         .firestore()
@@ -39,9 +61,8 @@ export async function GET(req: Request) {
         .get();
       const thoughts = thoughtsSnap.docs.map((doc) => ({
         id: doc.id,
-        ...doc.data(),
+        ...decryptData(doc.data()),
       })) as Thought[];
-
       const client: Client = {
         uid: decoded.uid,
         firstName: userData.firstName,
@@ -56,13 +77,10 @@ export async function GET(req: Request) {
 
     if (userData?.role === "professional") {
       const clientIds: string[] = userData.clients || [];
-      console.log("Aqui1", clientIds);
       const clientRefs = clientIds.map((id) =>
         admin.firestore().doc(`users/${id}`)
       );
-      console.log("Aqui2", clientRefs);
       const clientSnaps = await Promise.all(clientRefs.map((ref) => ref.get()));
-      console.log("Aqui3");
       const clients: Client[] = await Promise.all(
         clientSnaps.map(async (snap) => {
           if (!snap.exists) return null;
@@ -73,18 +91,18 @@ export async function GET(req: Request) {
             .collection(`users/${snap.id}/thoughts`)
             .get();
 
-          const thoughts: Thought[] = thoughtsSnap.docs.map((d) => ({
-            id: d.id,
-            ...d.data(),
+          const thoughts: Thought[] = thoughtsSnap.docs.map((doc) => ({
+            id: doc.id,
+            ...decryptData(doc.data()),
           })) as Thought[];
 
           return {
             uid: snap.id,
-            firstName: data.firstName,
-            lastName: data.lastName,
-            email: data.email,
+            firstName: data?.firstName,
+            lastName: data?.lastName,
+            email: data?.email,
             role: "client" as const,
-            nameResponsible: data.nameResponsible,
+            nameResponsible: data?.nameResponsible,
             thoughts,
           };
         })
@@ -100,7 +118,7 @@ export async function GET(req: Request) {
         clientsProfiles: clients,
       };
 
-      return NextResponse.json(professional);
+      return NextResponse.json(professional, { status: 200 });
     }
   } catch (err: unknown) {
     const errorMessage = err instanceof Error ? err.message : String(err);

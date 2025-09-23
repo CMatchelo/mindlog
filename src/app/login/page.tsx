@@ -4,8 +4,6 @@ import { useAuth } from "@/Contexts/AuthContext";
 import { useRouter } from "next/navigation";
 import { useEffect } from "react";
 import { useForm } from "react-hook-form";
-import { doc, getDoc } from "firebase/firestore";
-import { db } from "../../../firebase";
 import { redirectByRole } from "@/utils/redirectByRole";
 
 interface LoginFormInputs {
@@ -24,6 +22,7 @@ export default function Page() {
 
   useEffect(() => {
     if (!loading && user) {
+      console.log("Redirecting based on role:", user.role);
       redirectByRole(user, router);
     }
   }, [user, loading, router]);

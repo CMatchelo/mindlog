@@ -1,6 +1,6 @@
 import { Thought } from "./thoughts";
 
-export type Role = "professional" | "client";
+export type Role = "professional" | "client" | "admin";
 
 export interface BaseUser {
   uid: string;
@@ -8,6 +8,10 @@ export interface BaseUser {
   lastName: string;
   email: string;
   role: Role;
+}
+
+export interface Admin extends BaseUser {
+  role: "admin";
 }
 
 export interface Professional extends BaseUser {
@@ -22,4 +26,4 @@ export interface Client extends BaseUser {
   thoughts: Thought[];
 }
 
-export type UserType = Professional | Client;
+export type UserType = Professional | Client | Admin;

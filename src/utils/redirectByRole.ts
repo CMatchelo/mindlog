@@ -1,9 +1,9 @@
-import { User } from "firebase/auth";
 import { doc, getDoc } from "firebase/firestore";
 import { AppRouterInstance } from "next/dist/shared/lib/app-router-context.shared-runtime";
 import { db } from "../../firebase";
+import { Professional, Client, Admin } from "@/Types/user";
 
-export const redirectByRole = async (user: User, router: AppRouterInstance) => {
+export const redirectByRole = async (user: Professional | Client | Admin, router: AppRouterInstance) => {
   if (!user) {
     router.push("/login");
     return;
@@ -22,7 +22,7 @@ export const redirectByRole = async (user: User, router: AppRouterInstance) => {
     case "professional":
       router.push(`/psi`);
       break;
-    case "paciente":
+    case "client":
       router.push(`/client/`);
       break;
     case "admin":
