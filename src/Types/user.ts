@@ -16,6 +16,7 @@ export interface Admin extends BaseUser {
 
 export interface Professional extends BaseUser {
   role: "professional";
+  crp: string;
   clients: string[];
   clientsProfiles?: Client[]; // lista de IDs dos pacientes
 }
@@ -23,6 +24,7 @@ export interface Professional extends BaseUser {
 export interface Client extends BaseUser {
   role: "client";
   nameResponsible: string;
+  crpResponsible: string;
   thoughts: Thought[];
 }
 

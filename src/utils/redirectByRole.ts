@@ -23,7 +23,7 @@ export const redirectByRole = async (user: Professional | Client | Admin, router
       router.push(`/psi`);
       break;
     case "client":
-      router.push(`/client/`);
+      router.push(`/pacient/`);
       break;
     case "admin":
       router.push("/admin");

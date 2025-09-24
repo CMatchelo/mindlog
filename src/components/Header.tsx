@@ -9,7 +9,7 @@ export const Header = () => {
     }
 
     return (
-        <header className="p-4 bg-blue-600 text-white">
+        <header className="p-4 bg-primary1 text-white">
             <h1 className="text-2xl font-bold">MindLog</h1>
             <button onClick={handleSignOut}> Sair </button>
         </header>

@@ -35,7 +35,7 @@ export const useRoleGuard = (expectedRole: Role) => {
             router.push(`/psi`);
             break;
           case "client":
-            router.push(`/client`);
+            router.push(`/pacient`);
             break;
           case "admin":
             router.push("/admin");

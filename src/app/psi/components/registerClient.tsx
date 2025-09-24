@@ -20,6 +20,7 @@ export const RegisterClient = () => {
 
   const handleRegisterClient = async (formData: RegisterClientInputs) => {
     const token = await auth.currentUser?.getIdToken();
+    if (!user || user.role !== "professional") return;
     const res = await fetch("api/registerClient", {
       method: "POST",
       headers: {
@@ -30,7 +31,8 @@ export const RegisterClient = () => {
         email: formData.email,
         firstName: formData.firstName,
         lastName: formData.lastName,
-        nameResponsible: user?.firstName + " " + user?.lastName
+        nameResponsible: `${user.firstName} ${user.lastName}`,
+        crpResponsible: user?.crp
       }),
     });
 

@@ -70,6 +70,7 @@ export async function GET(req: Request) {
         email: userData.email,
         role: "client",
         nameResponsible: userData.nameResponsible,
+        crpResponsible: userData.crpResponsible,
         thoughts: thoughts,
       };
       return NextResponse.json(client, { status: 200 });
@@ -103,6 +104,7 @@ export async function GET(req: Request) {
             email: data?.email,
             role: "client" as const,
             nameResponsible: data?.nameResponsible,
+            crpResponsible: data?.crpResponsible,
             thoughts,
           };
         })
