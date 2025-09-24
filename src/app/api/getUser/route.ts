@@ -60,14 +60,15 @@ export async function GET(req: Request) {
         .collection(`users/${decoded.uid}/thoughts`)
         .get();
 
-      const thoughts = thoughtsSnap.docs.map((doc) => ({
-        id: doc.id,
-        ...decryptData(doc.data()),
-      })) as Thought[];
-
-      const orderedThoughts = thoughts.sort(
-        (a, b) => b.createdAt.toMillis() - a.createdAt.toMillis()
-      );
+      const thoughts = thoughtsSnap.docs
+        .map((doc) => ({
+          id: doc.id,
+          ...decryptData(doc.data()),
+          createdAt: doc.data().createdAt?.toDate() ?? new Date(),
+        }))
+        .sort(
+          (a, b) => b.createdAt.getTime() - a.createdAt.getTime()
+        ) as Thought[];
 
       const client: Client = {
         uid: decoded.uid,
@@ -77,7 +78,7 @@ export async function GET(req: Request) {
         role: "client",
         nameResponsible: userData.nameResponsible,
         crpResponsible: userData.crpResponsible,
-        thoughts: orderedThoughts,
+        thoughts,
       };
       return NextResponse.json(client, { status: 200 });
     }
@@ -98,14 +99,15 @@ export async function GET(req: Request) {
             .collection(`users/${snap.id}/thoughts`)
             .get();
 
-          const thoughts: Thought[] = thoughtsSnap.docs.map((doc) => ({
-            id: doc.id,
-            ...decryptData(doc.data()),
-          })) as Thought[];
-
-          const orderedThoughts = thoughts.sort(
-            (a, b) => b.createdAt.toMillis() - a.createdAt.toMillis()
-          );
+          const thoughts = thoughtsSnap.docs
+            .map((doc) => ({
+              id: doc.id,
+              ...decryptData(doc.data()),
+              createdAt: doc.data().createdAt?.toDate() ?? new Date(),
+            }))
+            .sort(
+              (a, b) => b.createdAt.getTime() - a.createdAt.getTime()
+            ) as Thought[];
 
           return {
             uid: snap.id,
@@ -115,7 +117,7 @@ export async function GET(req: Request) {
             role: "client" as const,
             nameResponsible: data?.nameResponsible,
             crpResponsible: data?.crpResponsible,
-            thoughts: orderedThoughts,
+            thoughts,
           };
         })
       ).then((res) => res.filter(Boolean) as Client[]);

@@ -9,9 +9,14 @@ interface ThoughtProps {
 export const ThoughtCard = ({ thought }: ThoughtProps) => {
   const [open, setOpen] = useState(false);
 
+  const creationDate =
+  thought.createdAt instanceof Date
+    ? thought.createdAt
+    : new Date(thought.createdAt);
+
   return (
     <div className="flex flex-col justify-between p-4 bg-white/70 rounded-lg shadow-sm hover:shadow-md hover:bg-white transition">
-      <div className="flex flex-row items-center justify-between">
+      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
         <div className="font-semibold">{thought.situation}</div>
         <Button classname="self-end" onClick={() => setOpen(!open)}>
           Ver detalhes
@@ -33,6 +38,9 @@ export const ThoughtCard = ({ thought }: ThoughtProps) => {
 
           <div className="font-semibold">Pensamento alternativo</div>
           <div>{thought.alternativeThought}</div>
+
+          <div className="font-semibold">Data do registro</div>
+          <div>{creationDate.toLocaleDateString("pt-BR")}</div>
         </div>
       )}
     </div>
