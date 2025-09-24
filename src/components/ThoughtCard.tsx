@@ -1,5 +1,6 @@
 import { Thought } from "@/Types/thoughts";
 import { useState } from "react";
+import { Button } from "./Button";
 
 interface ThoughtProps {
   thought: Thought;
@@ -9,14 +10,13 @@ export const ThoughtCard = ({ thought }: ThoughtProps) => {
   const [open, setOpen] = useState(false);
 
   return (
-    <div
-      className="border rounded-md p-2 mb-2 cursor-pointer bg-white"
-      onClick={() => setOpen(!open)}
-    >
-      {/* Sempre aparece: Situação */}
-      <div className="font-semibold">{thought.situation}</div>
-
-      {/* Expandido */}
+    <div className="flex flex-col justify-between p-4 bg-white/70 rounded-lg shadow-sm hover:shadow-md hover:bg-white transition">
+      <div className="flex flex-row items-center justify-between">
+        <div className="font-semibold">{thought.situation}</div>
+        <Button classname="self-end" onClick={() => setOpen(!open)}>
+          Ver detalhes
+        </Button>
+      </div>
       {open && (
         <div className="mt-2 grid grid-cols-1 sm:grid-cols-[250px_1fr] sm:gap-2 gap-1">
           <div className="font-semibold">Emoção</div>

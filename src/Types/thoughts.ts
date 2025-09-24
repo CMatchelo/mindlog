@@ -1,3 +1,5 @@
+import { Timestamp } from "firebase/firestore";
+
 export interface Thought {
   id?: string;
   situation: string;
@@ -6,5 +8,5 @@ export interface Thought {
   evidenceFor?: string;
   evidenceAgainst?: string;
   alternativeThought?: string;
-  createdAt?: unknown; // firebase.Timestamp se quiser tipar melhor
+  createdAt: Timestamp
 }

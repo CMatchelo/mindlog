@@ -5,6 +5,7 @@ import { useAuth } from "@/Contexts/AuthContext";
 import { useRoleGuard } from "@/hooks/useRoleGuard";
 import { useRouter } from "next/navigation";
 import { RegisterPsi } from "./components/registerPsi";
+import LoadingScreen from "@/components/LoadingScreen";
 
 export default function Page() {
 
@@ -12,7 +13,7 @@ export default function Page() {
   const router = useRouter();
 
   const checking = useRoleGuard("admin");
-    if (checking) return <p>Verificando permissões...</p>;
+    if (checking) return <LoadingScreen />
 
   if (!user && loading) {
     return <div>Carregando...</div>;

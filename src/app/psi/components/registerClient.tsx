@@ -1,13 +1,46 @@
 import { sendPasswordResetEmail } from "firebase/auth";
-import { useForm } from "react-hook-form";
+import { FieldErrors, useForm, UseFormRegister } from "react-hook-form";
 import { auth } from "../../../../firebase";
 import { useAuth } from "@/Contexts/AuthContext";
+import { Button } from "@/components/Button";
 
 interface RegisterClientInputs {
   email: string;
   firstName: string;
   lastName: string;
 }
+
+interface InputFormProps {
+  type: string;
+  title: string;
+  placeholder: string;
+  register: UseFormRegister<RegisterClientInputs>;
+  errors: FieldErrors<RegisterClientInputs>;
+  name: "firstName" | "lastName" | "email";
+}
+
+const InputForm = ({
+  type,
+  title,
+  placeholder,
+  register,
+  errors,
+  name,
+}: InputFormProps) => {
+  const error = errors[name]?.message as string | undefined;
+  return (
+    <div className="flex flex-col w-full gap-1">
+      <label className="text-md font-bold">{title}</label>
+      <input
+      className="bg-secondary1 p-1 rounded-sm border-1 boder"
+        type={type}
+        placeholder={placeholder}
+        {...register(name, { required: "Campo obrigatório" })}
+      />
+      {error && <p className="text-red-500">Campo obrigatório</p>}
+    </div>
+  );
+};
 
 export const RegisterClient = () => {
   const {
@@ -27,12 +60,12 @@ export const RegisterClient = () => {
         "Content-Type": "application/json",
         Authorization: `Bearer ${token}`,
       },
-      body: JSON.stringify({ 
+      body: JSON.stringify({
         email: formData.email,
         firstName: formData.firstName,
         lastName: formData.lastName,
         nameResponsible: `${user.firstName} ${user.lastName}`,
-        crpResponsible: user?.crp
+        crpResponsible: user?.crp,
       }),
     });
 
@@ -46,33 +79,36 @@ export const RegisterClient = () => {
   };
 
   return (
-    <div>
-      <h1>Registrar novo Cliente</h1>
-      <form onSubmit={handleSubmit(handleRegisterClient)}>
-        <input
+    <div className="bg-secondary2 p-4 rounded-md shadow-md space-y-3 sm:space-y-2">
+      <h1 className="text-lg font-bold">Novo Paciente</h1>
+      <form className="flex flex-col sm:flex-row items-start justify-around gap-5"
+      onSubmit={handleSubmit(handleRegisterClient)}>
+        <InputForm
+          name="email"
           type="email"
-          placeholder="email"
-          {...register("email", { required: "Digite o email" })}
+          title="Email"
+          placeholder="email@exemplo.com"
+          register={register}
+          errors={errors}
         />
-        {errors.email && <p className="text-red-500">{errors.email.message}</p>}
-
-        <input
+        <InputForm
+          name="firstName"
           type="text"
-          placeholder="nome"
-          {...register("firstName", { required: "Digite o nome" })}
+          title="Nome"
+          placeholder="Nome do paciente"
+          register={register}
+          errors={errors}
         />
-        {errors.firstName && <p className="text-red-500">{errors.firstName.message}</p>}
-
-        <input
+        <InputForm
+          name="lastName"
           type="text"
-          placeholder="sobrenome"
-          {...register("lastName", { required: "Digite o sobrenome" })}
+          title="Sobrenome"
+          placeholder="Sobrenome do paciente"
+          register={register}
+          errors={errors}
         />
-        {errors.lastName && (
-          <p className="text-red-500">{errors.lastName.message}</p>
-        )}
 
-        <button type="submit">Registrar</button>
+        <Button classname="self-center" type="submit">Registrar</Button>
       </form>
     </div>
   );

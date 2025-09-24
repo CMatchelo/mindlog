@@ -4,6 +4,8 @@ import { auth } from "../../../../firebase";
 import { useState } from "react";
 import { ArrowLeftIcon, ArrowRightIcon } from "@/utils/icons";
 import { Button } from "@/components/Button";
+import LoadingScreen from "@/components/LoadingScreen";
+import { PopupMessage } from "@/components/PopupMessage";
 
 interface RegisterThoughtInputs {
   situation: string;
@@ -74,14 +76,20 @@ export const RegisterTought = () => {
     handleSubmit,
     getValues,
     formState: { errors },
+    reset 
   } = useForm<RegisterThoughtInputs>();
 
   const { user } = useAuth();
   const [step, setStep] = useState(1);
+  const [savingThought, setSavingThought] = useState(false);
+  const [displayPopup, setDisplayPopup] = useState(false);
+  const [popupMsg, setPopupMsg] = useState<string>("Pensamento salvo com sucesso")
 
   const handleRegisterThought = async (formData: RegisterThoughtInputs) => {
+    setSavingThought(true);
     if (!user || user.role !== "client") {
       console.error("Usuário não autenticado ou não é um cliente.");
+      setSavingThought(false);
       return;
     }
     try {
@@ -94,17 +102,21 @@ export const RegisterTought = () => {
         body: JSON.stringify({ ...formData }),
       });
 
-      const data = await res.json();
+      await res.json();
 
       if (!res.ok) {
-        console.error("Erro ao registrar pensamento:", data.error);
+        setPopupMsg("Erro ao registrar pensamento. Tente novamente")
       } else {
-        console.log("Pensamento registrado com sucesso!");
+        setStep(1);
+        reset();
+        setPopupMsg("Pensamento registrado com sucesso")
       }
     } catch (err) {
       console.error("Erro ao registrar pensamento:", err);
+      setPopupMsg("Erro ao registrar pensamento. Tente novamente")
     } finally {
-      console.log("Função finalizada com sucesso!");
+      setSavingThought(false);
+      setDisplayPopup(true);
     }
   };
 
@@ -130,10 +142,22 @@ export const RegisterTought = () => {
     setStep((prev) => prev - 1);
   };
 
+  if (savingThought) {
+    return (
+      <LoadingScreen />
+    );
+  }
+
+  if (displayPopup) {
+    return (
+      <PopupMessage message={popupMsg} onClose={() => setDisplayPopup(false)} />
+    );
+  }
+
   return (
     <div className="bg-secondary2 my-2 p-2 rounded-md shadow-lg flex flex-col">
       <h1 className="self-center text-md sm:text-2xl font-bold mb-2 text-primary1">
-        Regitrar novo pensamento
+        Registrar novo pensamento
       </h1>
       <form
         onSubmit={handleSubmit(handleRegisterThought)}
@@ -199,7 +223,7 @@ export const RegisterTought = () => {
           />
         </div>
         {step >= 7 && (
-          <div className="self-center sm:max-w-1/2">
+          <div className="self-center w-[100%] sm:max-w-1/2">
             {Object.entries(getValues()).map(([key, value]) => {
               const title =
                 questionTitles[key as keyof RegisterThoughtInputs] || key;

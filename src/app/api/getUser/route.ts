@@ -59,10 +59,16 @@ export async function GET(req: Request) {
         .firestore()
         .collection(`users/${decoded.uid}/thoughts`)
         .get();
+
       const thoughts = thoughtsSnap.docs.map((doc) => ({
         id: doc.id,
         ...decryptData(doc.data()),
       })) as Thought[];
+
+      const orderedThoughts = thoughts.sort(
+        (a, b) => b.createdAt.toMillis() - a.createdAt.toMillis()
+      );
+
       const client: Client = {
         uid: decoded.uid,
         firstName: userData.firstName,
@@ -71,7 +77,7 @@ export async function GET(req: Request) {
         role: "client",
         nameResponsible: userData.nameResponsible,
         crpResponsible: userData.crpResponsible,
-        thoughts: thoughts,
+        thoughts: orderedThoughts,
       };
       return NextResponse.json(client, { status: 200 });
     }
@@ -97,6 +103,10 @@ export async function GET(req: Request) {
             ...decryptData(doc.data()),
           })) as Thought[];
 
+          const orderedThoughts = thoughts.sort(
+            (a, b) => b.createdAt.toMillis() - a.createdAt.toMillis()
+          );
+
           return {
             uid: snap.id,
             firstName: data?.firstName,
@@ -105,7 +115,7 @@ export async function GET(req: Request) {
             role: "client" as const,
             nameResponsible: data?.nameResponsible,
             crpResponsible: data?.crpResponsible,
-            thoughts,
+            thoughts: orderedThoughts,
           };
         })
       ).then((res) => res.filter(Boolean) as Client[]);
@@ -114,6 +124,7 @@ export async function GET(req: Request) {
         uid: decoded.uid,
         firstName: userData.firstName,
         lastName: userData.lastName,
+        crp: userData.crp,
         email: userData.email || "",
         role: "professional",
         clients: clientIds,

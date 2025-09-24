@@ -7,7 +7,7 @@ interface ThoughtTableProps {
 
 export const ThoughtTable = ({ thoughts }: ThoughtTableProps) => {
   return (
-    <div>
+    <div className="bg-secondary2 p-4 rounded-lg shadow-lg space-y-4">
       <h1 className="mt-4 mb-2 font-bold text-lg sm:text-xl">
         Pensamentos registrados
       </h1>
