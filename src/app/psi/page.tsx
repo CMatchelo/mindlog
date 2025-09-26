@@ -8,7 +8,7 @@ import { RegisterClient } from "./components/registerClient";
 import LoadingScreen from "@/components/LoadingScreen";
 import { Client, Professional } from "@/Types/user";
 import { ClientsTable } from "./components/clientsTable";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { ThoughtTable } from "@/components/ThoughtTable";
 import { Button } from "@/components/Button";
 
@@ -19,15 +19,18 @@ export default function Page() {
   const [selecteClient, setSelectedClient] = useState<Client | null>();
 
   const checking = useRoleGuard("professional");
+
+  useEffect(() => {
+    if (!user && loading) {
+      return;
+    }
+
+    if (!user && !loading) {
+      router.push(`/login`);
+    }
+  }, [user, loading, router]);
+
   if (checking) return <LoadingScreen />;
-
-  if (!user && loading) {
-    return <div>Carregando...</div>;
-  }
-
-  if (!user && !loading) {
-    router.push(`/login`);
-  }
 
   const handleSelectClient = (client: Client) => {
     setSelectedClient(client);
@@ -58,7 +61,9 @@ export default function Page() {
         selecteClient.thoughts.length > 0 ? (
           <div className="flex flex-col bg-secondary2 rounded-md">
             <div className="bg-secondary2 flex flex-row items-center rounded-md gap-4 p-4 justify-between">
-              <span className="text-lg font-bold">Paciente: {selecteClient.firstName} {selecteClient.lastName} </span>
+              <span className="text-lg font-bold">
+                Paciente: {selecteClient.firstName} {selecteClient.lastName}{" "}
+              </span>
               <Button onClick={() => setSelectedClient(null)}>Voltar</Button>
             </div>
             <ThoughtTable thoughts={selecteClient.thoughts} />

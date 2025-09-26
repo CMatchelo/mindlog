@@ -32,7 +32,11 @@ export const RegisterPsi = () => {
     const data = await res.json();
     if (res.ok) {
       alert("Profissional registrado com sucesso!");
-      await sendPasswordResetEmail(auth, formData.email);
+      const actionCodeSettings = {
+        url: "http://localhost:3000/resetPassword",
+        handleCodeInApp: false,
+      };
+      await sendPasswordResetEmail(auth, formData.email, actionCodeSettings);
     } else {
       alert(`Erro ao registrar profissional: ${data.error}`);
     }

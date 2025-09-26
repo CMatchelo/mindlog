@@ -10,7 +10,9 @@ export const Button = ({ children, type, onClick, classname }: ButtonProps) => {
         <button 
         type={type} 
         onClick={onClick} 
-        className={`bg-primary1 text-white px-4 py-2 rounded hover:bg-primary1Light active:bg-primary1Dark transition cursor-pointer ${classname}`}>
+        className={`bg-primary1 text-white hover:bg-primary1Light active:bg-primary1Dark transition
+         px-4 py-2 rounded min-w-40 
+         cursor-pointer ${classname}`}>
             {children}
         </button>
     )
