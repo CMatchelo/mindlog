@@ -75,10 +75,10 @@ export default function Page() {
             >
               Redefinir
             </button>
-            {status === "error" && (
-              <p className="text-center text-red-600">Erro ao redefinir senha. Tente novamente.</p>
-            )}
           </form>
+        )}
+        {status === "error" && (
+          <p className="text-center text-red-600">Erro ao redefinir senha. Tente novamente.</p>
         )}
       </div>
     </div>

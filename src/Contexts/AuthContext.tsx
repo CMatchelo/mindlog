@@ -6,9 +6,9 @@ import { onAuthStateChanged, signInWithEmailAndPassword } from "firebase/auth";
 import { createContext, useEffect, useState } from "react";
 import { auth } from "../../firebase";
 import React from "react";
-import { Client, Professional, UserType } from "@/Types/user";
+import { Client, Professional, Admin, UserType } from "@/Types/user";
 
-type AppUser = Professional | Client | null;
+type AppUser = Professional | Client | Admin | null;
 
 interface AuthContextType {
   user: AppUser;
@@ -53,7 +53,6 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         if (!res.ok) throw new Error("Erro ao buscar usuário");
 
         const fullUser: UserType = await res.json();
-        console.log("Usuário completo:", fullUser);
         setUser(fullUser);
       } catch (err) {
         console.error("Erro ao carregar usuário:", err);

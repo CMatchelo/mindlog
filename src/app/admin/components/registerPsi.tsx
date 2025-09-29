@@ -6,6 +6,7 @@ interface RegisterPsiInputs {
   email: string;
   firstName: string;
   lastName: string;
+  crp: string;
 }
 
 export const RegisterPsi = () => {
@@ -23,10 +24,12 @@ export const RegisterPsi = () => {
         "Content-Type": "application/json",
         Authorization: `Bearer ${token}`,
       },
-      body: JSON.stringify({ 
+      body: JSON.stringify({
         email: formData.email,
         firstName: formData.firstName,
-        lastName: formData.lastName}),
+        lastName: formData.lastName,
+        crp: formData.crp,
+      }),
     });
 
     const data = await res.json();
@@ -58,7 +61,9 @@ export const RegisterPsi = () => {
           placeholder="nome"
           {...register("firstName", { required: "Digite o nome" })}
         />
-        {errors.firstName && <p className="text-red-500">{errors.firstName.message}</p>}
+        {errors.firstName && (
+          <p className="text-red-500">{errors.firstName.message}</p>
+        )}
 
         <input
           type="text"
@@ -67,6 +72,15 @@ export const RegisterPsi = () => {
         />
         {errors.lastName && (
           <p className="text-red-500">{errors.lastName.message}</p>
+        )}
+
+        <input
+          type="text"
+          placeholder="crp"
+          {...register("crp", { required: "Digite o CRP" })}
+        />
+        {errors.crp && (
+          <p className="text-red-500">{errors.crp.message}</p>
         )}
 
         <button type="submit">Registrar</button>

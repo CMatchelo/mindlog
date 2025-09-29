@@ -88,9 +88,12 @@ export const RegisterClient = () => {
         handleCodeInApp: false,
       };
       await sendPasswordResetEmail(auth, formData.email, actionCodeSettings);
-      alert("Cliente registrado com sucesso!!");
+      setPopupMsg("Cliente cadastrado com sucesso. Ele receberá um email pedindo para finalizar a criação da conta.")
+      setDisplayPopup(true)
       setChecking(false);
     } else {
+      setPopupMsg("Erro ao registrar cliente. Tente novamente mais tarde")
+      setDisplayPopup(true)
       alert(`Erro ao registrar profissional: ${data.error}`);
       setChecking(false);
     }
