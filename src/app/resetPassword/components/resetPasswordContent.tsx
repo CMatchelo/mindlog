@@ -1,4 +1,4 @@
-"use client"
+"use client";
 
 import {
   confirmPasswordReset,
@@ -15,6 +15,9 @@ export const ResetPasswordContent = () => {
   const oobCode = searchParams.get("oobCode");
 
   const [newPassword, setNewPassword] = useState("");
+  const [confirmPassword, setconfirmPassword] = useState("");
+  const [disableBtn, setDisableBtn] = useState(true);
+  const [matchMsg, setMatchMsg] = useState(false);
   const [status, setStatus] = useState<
     "loading" | "valid" | "invalid" | "success" | "error"
   >("loading");
@@ -29,6 +32,24 @@ export const ResetPasswordContent = () => {
       .then(() => setStatus("valid"))
       .catch(() => setStatus("invalid"));
   }, [oobCode, auth]);
+
+  useEffect(() => {
+    if (!confirmPassword) {
+      setMatchMsg(false);
+      setDisableBtn(true);
+    }
+    if (!newPassword) {
+      setMatchMsg(false);
+      setDisableBtn(true);
+    }
+    if (confirmPassword && newPassword && confirmPassword != newPassword) {
+      setMatchMsg(true);
+      setDisableBtn(true);
+      return;
+    }
+    setMatchMsg(false);
+    setDisableBtn(false);
+  }, [confirmPassword, newPassword]);
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -70,9 +91,28 @@ export const ResetPasswordContent = () => {
             required
             className="border p-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary1"
           />
+          <input
+            type="password"
+            placeholder="Confirme a nova senha"
+            value={confirmPassword}
+            onChange={(e) => setconfirmPassword(e.target.value)}
+            required
+            className="border p-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary1"
+          />
+          {disableBtn && (
+            <p className="text-center text-red-600">Senhas não coincidem</p>
+          )}
           <button
             type="submit"
-            className="w-full bg-primary1 text-white py-3 rounded-lg font-medium hover:bg-primary1Light active:bg-primary1Dark transition"
+            disabled={disableBtn}
+            className={`
+              w-full py-3 rounded-lg font-medium transition
+              ${
+                disableBtn
+                  ? "bg-gray-400 text-gray-200 cursor-not-allowed"
+                  : "bg-primary1 text-white hover:bg-primary1Light active:bg-primary1Dark cursor-pointer"
+              }
+            `}
           >
             Redefinir
           </button>

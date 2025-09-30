@@ -77,7 +77,7 @@ export default function Page() {
         <h1
           className={`${bebasNeue.className} text-primary1 text-3xl sm:text-4xl font-bold mb-4`}
         >
-          Mindlog
+          Reorganizar
         </h1>
         <p className="text-primary1/90 text-lg sm:text-xl leading-relaxed">
           Registre e acompanhe pensamentos de forma simples e segura.
