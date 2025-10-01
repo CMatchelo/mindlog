@@ -3,6 +3,7 @@
 import {
   confirmPasswordReset,
   getAuth,
+  sendPasswordResetEmail,
   verifyPasswordResetCode,
 } from "firebase/auth";
 import { useRouter, useSearchParams } from "next/navigation";
@@ -18,6 +19,10 @@ export const ResetPasswordContent = () => {
   const [confirmPassword, setconfirmPassword] = useState("");
   const [disableBtn, setDisableBtn] = useState(true);
   const [matchMsg, setMatchMsg] = useState(false);
+  const [email, setEmail] = useState("");
+  const [resendMsg, setResendMsg] = useState<"idle" | "success" | "error">(
+    "idle"
+  );
   const [status, setStatus] = useState<
     "loading" | "valid" | "invalid" | "success" | "error"
   >("loading");
@@ -34,25 +39,25 @@ export const ResetPasswordContent = () => {
   }, [oobCode, auth]);
 
   useEffect(() => {
-    if (!confirmPassword) {
+    if (!newPassword || !confirmPassword) {
+      setDisableBtn(true);
       setMatchMsg(false);
-      setDisableBtn(true);
-    }
-    if (!newPassword) {
-      setMatchMsg(false);
-      setDisableBtn(true);
-    }
-    if (confirmPassword && newPassword && confirmPassword != newPassword) {
-      setMatchMsg(true);
-      setDisableBtn(true);
       return;
     }
-    setMatchMsg(false);
+
     setDisableBtn(false);
-  }, [confirmPassword, newPassword]);
+    setMatchMsg(false);
+  }, [newPassword, confirmPassword]);
 
   async function handleSubmit(e: React.FormEvent) {
+    setDisableBtn(true);
     e.preventDefault();
+    if (confirmPassword != newPassword) {
+      setMatchMsg(true);
+      setDisableBtn(false);
+      return;
+    }
+
     if (!oobCode) return;
 
     try {
@@ -65,6 +70,17 @@ export const ResetPasswordContent = () => {
     }
   }
 
+  async function handleResend(e: React.FormEvent) {
+    e.preventDefault();
+    try {
+      await sendPasswordResetEmail(auth, email);
+      setResendMsg("success");
+    } catch (err) {
+      console.error(err);
+      setResendMsg("error");
+    }
+  }
+
   return (
     <div className="relative z-10 w-full max-w-md p-6 bg-white/80 rounded-2xl shadow-lg backdrop-blur-md">
       <h1 className="text-2xl font-bold text-center mb-6">Redefinir Senha</h1>
@@ -73,7 +89,37 @@ export const ResetPasswordContent = () => {
         <p className="text-center">Verificando link...</p>
       )}
       {status === "invalid" && (
-        <p className="text-center text-red-600">Link inválido ou expirado.</p>
+        <div className="flex flex-col gap-4">
+          <p className="text-center text-red-600">
+            Link inválido ou expirado. Solicite um novo link abaixo:
+          </p>
+          <form onSubmit={handleResend} className="flex flex-col gap-4">
+            <input
+              type="email"
+              placeholder="Digite seu e-mail"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              required
+              className="border p-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary1"
+            />
+            <button
+              type="submit"
+              className="w-full py-3 rounded-lg font-medium transition bg-primary1 text-white hover:bg-primary1Light active:bg-primary1Dark"
+            >
+              Reenviar link
+            </button>
+          </form>
+          {resendMsg === "success" && (
+            <p className="text-center text-green-600">
+              E-mail enviado com sucesso! Verifique sua caixa de entrada.
+            </p>
+          )}
+          {resendMsg === "error" && (
+            <p className="text-center text-red-600">
+              Erro ao enviar e-mail. Tente novamente.
+            </p>
+          )}
+        </div>
       )}
       {status === "success" && (
         <p className="text-center text-green-600">
@@ -99,7 +145,7 @@ export const ResetPasswordContent = () => {
             required
             className="border p-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary1"
           />
-          {disableBtn && (
+          {matchMsg && (
             <p className="text-center text-red-600">Senhas não coincidem</p>
           )}
           <button

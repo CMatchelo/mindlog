@@ -26,7 +26,7 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "Permissão negada" }, { status: 403 });
     }
 
-    const { email, firstName, lastName } = await req.json();
+    const { email, firstName, lastName, crp } = await req.json();
 
     const newUser = await admin.auth().createUser({
       email,
@@ -39,6 +39,7 @@ export async function POST(req: NextRequest) {
       email: email,
       firstName: firstName,
       lastName: lastName,
+      crp: crp,
       createdAt: admin.firestore.FieldValue.serverTimestamp(),
     });
 

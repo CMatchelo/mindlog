@@ -10,8 +10,8 @@ import LoadingScreen from "@/components/LoadingScreen";
 
 const bebasNeue = Bebas_Neue({
   subsets: ["latin"],
-  weight: "400", // Bebas Neue normalmente tem apenas weight 400
-  variable: "--font-bebas-neue", // Cria uma CSS variable
+  weight: "400",
+  variable: "--font-bebas-neue",
 });
 
 interface LoginFormInputs {
@@ -29,31 +29,35 @@ export default function Page() {
   } = useForm<LoginFormInputs>();
 
   const [checking, setChecking] = useState(false);
-  const [loginError, setLoginError] = useState(false)
+  const [loginError, setLoginError] = useState(false);
 
   useEffect(() => {
+    setChecking(true);
     if (!loading && user) {
       redirectByRole(user, router);
     }
+    setChecking(false);
   }, [user, loading, router]);
 
   const handleLogin = async (data: LoginFormInputs) => {
     setChecking(true);
-    setLoginError(false)
+    setLoginError(false);
     try {
       await loginAcc(data.email, data.password);
     } catch (err) {
       console.log(err);
-      setLoginError(true)
+      setLoginError(true);
       setChecking(false);
     }
   };
 
+  if (loading) {
+    return <LoadingScreen />;
+  }
+
   return (
     <div className="min-h-screen flex items-center justify-center flex-col bg-gradient-to-br from-secondary1 to-secondary2">
-      {checking && (
-        <LoadingScreen />
-      )}
+      {checking && <LoadingScreen />}
       <div
         className="hidden sm:block absolute w-full sm:w-2/3 max-w-[700px] h-auto inset-0
       bg-[url('/bg_login_desk.png')] bg-contain bg-center bg-no-repeat mx-auto left-0 right-1/3
@@ -135,9 +139,9 @@ export default function Page() {
               </p>
             )}
             {loginError && (
-            <p className="text-sm text-red-500 mt-1">
+              <p className="text-sm text-red-500 mt-1">
                 Verifique suas credenciais e tente novamente
-            </p>
+              </p>
             )}
           </div>
 
