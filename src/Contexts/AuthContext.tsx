@@ -16,7 +16,7 @@ interface AuthContextType {
   loading: boolean;
   loginAcc: (email: string, password: string) => Promise<void>;
   signOut: () => Promise<void>;
-  addThought?: (thought: any) => void; // <-- nova função
+  addThought?: (thought: Thought) => void; // <-- nova função
 }
 
 const AuthContext = createContext<AuthContextType>({
@@ -109,7 +109,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         loading,
         loginAcc,
         signOut,
-        addThought, // <-- expõe no contexto
+        addThought,
       }}
     >
       {children}
