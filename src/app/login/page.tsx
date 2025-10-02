@@ -7,6 +7,7 @@ import { useForm } from "react-hook-form";
 import { redirectByRole } from "@/utils/redirectByRole";
 import { Bebas_Neue } from "next/font/google";
 import LoadingScreen from "@/components/LoadingScreen";
+import { getAuth, sendPasswordResetEmail } from "firebase/auth";
 
 const bebasNeue = Bebas_Neue({
   subsets: ["latin"],
@@ -25,11 +26,17 @@ export default function Page() {
   const {
     register,
     handleSubmit,
+    watch,
     formState: { errors },
   } = useForm<LoginFormInputs>();
 
+  const auth = getAuth();
   const [checking, setChecking] = useState(false);
   const [loginError, setLoginError] = useState(false);
+  const [emailReset, setEmailReset] = useState("");
+  const [emailSent, setEmailSent] = useState(false);
+  const [emailError, setEmailError] = useState(false);
+  const emailValue = watch("email"); // pega o valor atual do campo email
 
   useEffect(() => {
     setChecking(true);
@@ -45,10 +52,25 @@ export default function Page() {
     try {
       await loginAcc(data.email, data.password);
     } catch (err) {
-      console.log(err);
+      console.error(err);
       setLoginError(true);
       setChecking(false);
     }
+  };
+
+  const sendResetEmail = async () => {
+    setChecking(true);
+    setEmailError(false);
+    setEmailSent(false);
+    try {
+      await sendPasswordResetEmail(auth, emailValue);
+      setEmailReset(emailValue);
+      setEmailSent(true);
+    } catch (err) {
+      setEmailError(true);
+      console.error("Erro ao enviar email", err);
+    }
+    setChecking(false);
   };
 
   if (loading) {
@@ -153,6 +175,16 @@ export default function Page() {
           >
             Entrar
           </button>
+          <div
+            className="w-full flex flex-col items-center cursor-pointer"
+            onClick={sendResetEmail}
+          >
+            {emailSent && <span>Um email foi enviado para {emailReset}</span>}
+            {emailError && <span>Confira o email e tente novamente</span>}
+            <span className="text-blue-700 hover:text-blue-900 hover:underline">
+              Esqueci a senha
+            </span>
+          </div>
         </form>
       </div>
     </div>

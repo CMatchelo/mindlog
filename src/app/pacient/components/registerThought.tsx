@@ -76,14 +76,16 @@ export const RegisterTought = () => {
     handleSubmit,
     getValues,
     formState: { errors },
-    reset 
+    reset,
   } = useForm<RegisterThoughtInputs>();
 
-  const { user } = useAuth();
+  const { user, addThought } = useAuth();
   const [step, setStep] = useState(1);
   const [savingThought, setSavingThought] = useState(false);
   const [displayPopup, setDisplayPopup] = useState(false);
-  const [popupMsg, setPopupMsg] = useState<string>("Pensamento salvo com sucesso")
+  const [popupMsg, setPopupMsg] = useState<string>(
+    "Pensamento salvo com sucesso"
+  );
 
   const handleRegisterThought = async (formData: RegisterThoughtInputs) => {
     setSavingThought(true);
@@ -105,15 +107,17 @@ export const RegisterTought = () => {
       await res.json();
 
       if (!res.ok) {
-        setPopupMsg("Erro ao registrar pensamento. Tente novamente")
+        setPopupMsg("Erro ao registrar pensamento. Tente novamente");
       } else {
         setStep(1);
         reset();
-        setPopupMsg("Pensamento registrado com sucesso")
+        setPopupMsg("Pensamento registrado com sucesso");
+        const newThought = { ...formData, createdAt: new Date() };
+        addThought?.(newThought);
       }
     } catch (err) {
       console.error("Erro ao registrar pensamento:", err);
-      setPopupMsg("Erro ao registrar pensamento. Tente novamente")
+      setPopupMsg("Erro ao registrar pensamento. Tente novamente");
     } finally {
       setSavingThought(false);
       setDisplayPopup(true);
@@ -143,9 +147,7 @@ export const RegisterTought = () => {
   };
 
   if (savingThought) {
-    return (
-      <LoadingScreen />
-    );
+    return <LoadingScreen />;
   }
 
   if (displayPopup) {

@@ -83,7 +83,7 @@ export const ResetPasswordContent = () => {
 
   return (
     <div className="relative z-10 w-full max-w-md p-6 bg-white/80 rounded-2xl shadow-lg backdrop-blur-md">
-      <h1 className="text-2xl font-bold text-center mb-6">Redefinir Senha</h1>
+      <h1 className="text-2xl font-bold text-center mb-6">Criar Senha</h1>
 
       {status === "loading" && (
         <p className="text-center">Verificando link...</p>

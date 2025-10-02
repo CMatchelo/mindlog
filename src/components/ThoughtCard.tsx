@@ -18,10 +18,7 @@ export const ThoughtCard = ({ thought }: ThoughtProps) => {
     <div className="flex flex-col justify-between bg-secondary1 rounded-lg shadow-sm hover:shadow-md hover:bg-white transition">
       <div className="flex flex-col justify-between sm:flex-row items-start sm:items-center sm:items-centerjustify-between gap-3 p-4 bg-[#D8C2A9] rounded-t-lg">
         <div className="font-semibold text-lg">{thought.situation}</div>
-        <Button
-          classname="self-end"
-          onClick={() => setOpen(!open)}
-        >
+        <Button classname="self-end" onClick={() => setOpen(!open)}>
           Ver detalhes
         </Button>
       </div>
@@ -41,9 +38,10 @@ export const ThoughtCard = ({ thought }: ThoughtProps) => {
 
           <div className="font-semibold">Pensamento alternativo</div>
           <div>{thought.alternativeThought}</div>
-
           <div className="font-semibold">Data do registro</div>
-          <div>{creationDate.toLocaleDateString("pt-BR")}</div>
+          {creationDate && (
+            <div>{creationDate.toLocaleDateString("pt-BR")}</div>
+          )}
         </div>
       )}
     </div>

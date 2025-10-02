@@ -45,11 +45,11 @@ export default function Page() {
       <div className="p-4 flex flex-col gap-4">
         <div className="bg-secondary2 p-2 rounded-md shadow-md space-y-3 sm:space-y-2">
           <div className="flex flex-row sm:items-baseline flex-wrap gap-1 text-base sm:text-lg">
-            <h2 className="">Olá </h2>
+            <span>Olá</span>
             <h2 className="font-bold">
-              {" "}
               {professional?.firstName} {professional?.lastName}{" "}
             </h2>
+            <span className="hidden sm:block">, seja bem-vindo(a)!</span>
           </div>
           <div className="flex flex-row sm:items-baseline flex-wrap gap-1 text-base sm:text-lg">
             <h2>CRP -</h2>

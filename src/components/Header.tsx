@@ -11,7 +11,7 @@ export const Header = () => {
     return (
         <header className="p-4 bg-primary1 text-white">
             <h1 className="text-2xl font-bold">Reorganizar</h1>
-            <button onClick={handleSignOut}> Sair </button>
+            <button className="cursor-pointer hover:underline" onClick={handleSignOut}> Sair </button>
         </header>
     )
 }

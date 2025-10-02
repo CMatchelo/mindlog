@@ -7,6 +7,7 @@ import { createContext, useEffect, useState } from "react";
 import { auth } from "../../firebase";
 import React from "react";
 import { Client, Professional, Admin, UserType } from "@/Types/user";
+import { Thought } from "@/Types/thoughts";
 
 type AppUser = Professional | Client | Admin | null;
 
@@ -15,6 +16,7 @@ interface AuthContextType {
   loading: boolean;
   loginAcc: (email: string, password: string) => Promise<void>;
   signOut: () => Promise<void>;
+  addThought?: (thought: any) => void; // <-- nova função
 }
 
 const AuthContext = createContext<AuthContextType>({
@@ -22,6 +24,7 @@ const AuthContext = createContext<AuthContextType>({
   loading: true,
   loginAcc: async () => {},
   signOut: async () => {},
+  addThought: () => {},
 });
 
 export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
@@ -37,18 +40,15 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       }
 
       try {
-        // pega o token para autenticar na API
         const token = await fbUser.getIdToken();
 
         const res = await fetch("/api/getUser", {
           method: "GET",
-          headers: { 
+          headers: {
             "Content-type": "application/json",
-            Authorization: `Bearer ${token}`
+            Authorization: `Bearer ${token}`,
           },
         });
-
-        console.log("Resposta da API:", res);
 
         if (!res.ok) throw new Error("Erro ao buscar usuário");
 
@@ -81,6 +81,19 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     }
   };
 
+  const addThought = (thought: Thought) => {
+    setUser((prev) => {
+      if (!prev) return prev;
+      if ("thoughts" in prev) {
+        return {
+          ...prev,
+          thoughts: [thought, ...(prev.thoughts ?? [])],
+        };
+      }
+      return prev;
+    });
+  };
+
   const errorHandle = (err: unknown) => {
     if (err instanceof FirebaseError) {
       const msg = getFirebaseErrorMessage(err.code);
@@ -96,6 +109,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         loading,
         loginAcc,
         signOut,
+        addThought, // <-- expõe no contexto
       }}
     >
       {children}

@@ -11,8 +11,8 @@ export const ThoughtTable = ({ thoughts }: ThoughtTableProps) => {
       <h1 className="mt-4 mb-2 font-bold text-lg sm:text-xl">
         Pensamentos registrados
       </h1>
-      {thoughts.map((thought) => (
-        <ThoughtCard key={thought.id} thought={thought} />
+      {thoughts.map((thought, index) => (
+        <ThoughtCard key={thought.id ?? index} thought={thought} />
       ))}
     </div>
   );
